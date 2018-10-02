@@ -17,12 +17,15 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    //Things to change in Layout
     ImageView lightImage;
     Button lightButton;
 
+    // For checking values
     boolean lightOn = false;
     boolean hasFlash = false;
 
+    //Use camera HardWare
     android.hardware.Camera camera;
     android.hardware.Camera.Parameters parameters;
 
@@ -31,22 +34,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
+        //initialize id
         lightButton = findViewById(R.id.light_button);
         lightImage = findViewById(R.id.lightImage);
 
         hasFlash = getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
-        try {
-            camera = android.hardware.Camera.open();
-            parameters = camera.getParameters();
-        } catch (Exception e) {
+
+        if (hasFlash){
+            requestCameraForPermission();
+            try {
+                camera = android.hardware.Camera.open();
+                parameters = camera.getParameters();
+            } catch (Exception e) {
+                Toast.makeText(this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
-
-        requestCameraForPermission();
     }
+// On create Finnish
 
-
+    // set drawable file in layout as user response
     void setDrawableAsUserResponse() {
 
         if (lightOn) {
@@ -57,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             lightImage.setBackgroundResource(R.drawable.turn_off_image);
         }
     }
-
+//On click flash On/Of button
     public void flashLightAction(View view) {
         if (hasFlash) {
             if (lightOn) {
@@ -67,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 camera.stopPreview();
                 lightOn = false;
             } else {
-
+                // Flash Off
                 parameters.setFlashMode(android.hardware.Camera.Parameters.FLASH_MODE_TORCH);
                 camera.setParameters(parameters);
                 camera.startPreview();
@@ -77,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
             setDrawableAsUserResponse();
         } else {
+            //hasn't Flash Light
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(this)
                     .setTitle("Error")
                     .setMessage("Your Mobile Doesn't Have Flash Light")
@@ -92,11 +99,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    void requestCameraForPermission(){
+    //Request For App needed Permission
+    void requestCameraForPermission() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0);
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -104,15 +113,16 @@ public class MainActivity extends AppCompatActivity {
 
             finish();
             startActivity(new Intent(this, MainActivity.class));
-        }
-        else {
+        } else {
+
+            // Permission Denied
             AlertDialog.Builder builder = new AlertDialog.Builder(this)
                     .setTitle("Give Permission")
                     .setMessage("You have to give camera permission to use flash light")
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                           requestCameraForPermission();
+                            requestCameraForPermission();
                         }
                     });
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
