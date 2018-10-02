@@ -31,42 +31,42 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (ActivityCompat.checkSelfPermission(this,Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED){
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.CAMERA},0);
-        }
+
 
         lightButton = findViewById(R.id.light_button);
         lightImage = findViewById(R.id.lightImage);
 
-     hasFlash =getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
-     try{
-         camera = android.hardware.Camera.open();
-         parameters = camera.getParameters();
-     }catch (Exception e){}
+        hasFlash = getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
+        try {
+            camera = android.hardware.Camera.open();
+            parameters = camera.getParameters();
+        } catch (Exception e) {
+        }
 
+        requestCameraForPermission();
     }
-    void setDrawableAsUserResponse(){
+
+
+    void setDrawableAsUserResponse() {
 
         if (lightOn) {
             lightButton.setBackgroundResource(R.drawable.turn_on_button_backround);
             lightImage.setBackgroundResource(R.drawable.tun_on_image);
-        }
-        else {
+        } else {
             lightButton.setBackgroundResource(R.drawable.turn_off_button_backround);
             lightImage.setBackgroundResource(R.drawable.turn_off_image);
         }
     }
 
     public void flashLightAction(View view) {
-        if (hasFlash){
-            if (lightOn){
+        if (hasFlash) {
+            if (lightOn) {
 
                 parameters.setFlashMode(android.hardware.Camera.Parameters.FLASH_MODE_OFF);
                 camera.setParameters(parameters);
                 camera.stopPreview();
                 lightOn = false;
-            }
-            else {
+            } else {
 
                 parameters.setFlashMode(android.hardware.Camera.Parameters.FLASH_MODE_TORCH);
                 camera.setParameters(parameters);
@@ -76,8 +76,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             setDrawableAsUserResponse();
-        }
-        else {
+        } else {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(this)
                     .setTitle("Error")
                     .setMessage("Your Mobile Doesn't Have Flash Light")
@@ -87,20 +86,42 @@ public class MainActivity extends AppCompatActivity {
                             finish();
                         }
                     });
-                    alertDialog.create().show();
+            alertDialog.create().show();
         }
-
 
 
     }
 
+    void requestCameraForPermission(){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0);
+        }
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
             finish();
-            startActivity(new Intent(this,MainActivity.class));
+            startActivity(new Intent(this, MainActivity.class));
+        }
+        else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                    .setTitle("Give Permission")
+                    .setMessage("You have to give camera permission to use flash light")
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                           requestCameraForPermission();
+                        }
+                    });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+            builder.create().show();
         }
     }
 }
