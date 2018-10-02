@@ -1,12 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:background="@color/colorPrimary"
+    android:orientation="vertical"
+    android:gravity="center"
     >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/flash_light_text"
+        />
+    <Button
+        android:id="@+id/light_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/turn_off_button_backround"
+        android:layout_marginTop="150dp"
+        android:layout_marginBottom="100dp"
+        android:onClick="flashLightAction"
+        />
+    <ImageView
+        android:id="@+id/lightImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/turn_off_image"
+        />
 
 
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>
